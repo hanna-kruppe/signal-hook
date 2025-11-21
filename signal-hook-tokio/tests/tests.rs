@@ -15,7 +15,7 @@ use serial_test::serial;
 #[tokio::test]
 #[serial]
 async fn next_returns_recieved_signal() {
-    let mut signals = Signals::new(&[SIGUSR1]).unwrap();
+    let mut signals = Signals::new([SIGUSR1]).unwrap();
     raise(SIGUSR1).unwrap();
 
     let signal = signals.next().await;
@@ -26,7 +26,7 @@ async fn next_returns_recieved_signal() {
 #[tokio::test]
 #[serial]
 async fn close_signal_stream() {
-    let mut signals = Signals::new(&[SIGUSR1]).unwrap();
+    let mut signals = Signals::new([SIGUSR1]).unwrap();
     signals.handle().close();
 
     let result = signals.next().await;
@@ -42,7 +42,7 @@ async fn delayed() {
         recieved.store(true, Ordering::SeqCst);
     }
 
-    let signals = Signals::new(&[SIGUSR1]).unwrap();
+    let signals = Signals::new([SIGUSR1]).unwrap();
     let recieved = Arc::new(AtomicBool::new(false));
 
     let signals_task = tokio::spawn(get_signal(signals, Arc::clone(&recieved)));
