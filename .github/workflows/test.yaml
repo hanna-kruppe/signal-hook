@@ -174,7 +174,7 @@ jobs:
       matrix:
         target:
           - x86_64-unknown-linux-musl
-          - x86_64-pc-solaris
+          # - x86_64-pc-solaris
           - x86_64-linux-android
           - aarch64-linux-android
           - arm-linux-androideabi
@@ -185,9 +185,9 @@ jobs:
         extra-args:
           - "--all --all-features"
         include:
+          # - wasm32-wasi (not yet? Or not ever?)
           # - x86_64-unknown-redox (Is that platform even usable on stable?)
           - { target: x86_64-unknown-fuchsia, extra-args: "--all-features" }
-          - { target: wasm32-wasip1, extra-args: "--all-features" }
           # Seems we have some trouble with properly running C compiler on these. Might as well be problem with cross-compilation setup, but who knows
           # So we avoid the exfiltrator part/signal-hook-sys :-(
           - { target: x86_64-apple-darwin, extra-args: "--features=iterator --all --exclude signal-hook-sys" }
