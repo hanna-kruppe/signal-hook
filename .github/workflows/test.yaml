@@ -185,7 +185,7 @@ jobs:
           - "--all --all-features"
         include:
           # - x86_64-unknown-redox (Is that platform even usable on stable?)
-          - { target: x86_64-fuchsia, extra-args: "--all-features" }
+          - { target: x86_64-unknown-fuchsia, extra-args: "--all-features" }
           - { target: wasm32-wasip1, extra-args: "--all-features" }
           # Seems we have some trouble with properly running C compiler on these. Might as well be problem with cross-compilation setup, but who knows
           # So we avoid the exfiltrator part/signal-hook-sys :-(
