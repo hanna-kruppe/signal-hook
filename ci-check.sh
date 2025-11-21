@@ -8,6 +8,11 @@
 set -ex
 
 rm -f Cargo.lock
+
+if [ "$RUST_VERSION" = 1.36.0 ] || [ "$RUST_VERSION" = 1.40.0 ] ; then
+	sed -i -e 's/libc = "^0.2"/libc = "=0.2.156"/' Cargo.toml
+fi
+
 cargo build --all --exclude signal-hook-async-std --exclude signal-hook-tokio
 
 if [ "$RUST_VERSION" = 1.36.0 ] ; then

@@ -259,6 +259,7 @@ impl Prev {
     }
 
     #[cfg(not(windows))]
+    #[allow(clippy::incompatible_msrv)] // libc re-exports the core::ffi::c_void on rustc >= 1.30
     unsafe fn execute(&self, sig: c_int, info: *mut siginfo_t, data: *mut c_void) {
         let fptr = self.info.sa_sigaction;
         if fptr != 0 && fptr != libc::SIG_DFL && fptr != libc::SIG_IGN {
@@ -378,6 +379,7 @@ extern "C" fn handler(sig: c_int) {
 }
 
 #[cfg(not(windows))]
+#[allow(clippy::incompatible_msrv)] // libc re-exports the core::ffi::c_void on rustc >= 1.30
 extern "C" fn handler(sig: c_int, info: *mut siginfo_t, data: *mut c_void) {
     let globals = GlobalData::get();
     let fallback = globals.race_fallback.read();
