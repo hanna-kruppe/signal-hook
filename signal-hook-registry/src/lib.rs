@@ -140,7 +140,8 @@ type Action = Fn(&siginfo_t) + Send + Sync;
 #[derive(Clone)]
 struct Slot {
     prev: Prev,
-    // Actions are stored and executed in the order they were registered.
+    // We want to run the actions in the order they were inserted. A sorted map achieves this
+    // because the ActionIds are assigned in an increasing order.
     actions: VecMap<ActionId, Arc<Action>>,
 }
 

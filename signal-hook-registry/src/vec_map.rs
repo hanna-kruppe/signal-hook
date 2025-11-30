@@ -1,68 +1,72 @@
 use std::mem;
 
-/// A small map backed by an unsorted vector.
-///
-/// Maintains key uniqueness at cost of O(n) lookup/insert/remove. Maintains insertion order
-/// (`insert` calls that overwrite an existing value don't change order).
+/// A small map backed by a sorted vector.
 #[derive(Clone, Default)]
-pub struct VecMap<K, V>(Vec<(K, V)>);
+pub struct VecMap<K, V> {
+    keys: Vec<K>,
+    values: Vec<V>,
+}
 
-impl<K: Eq, V> VecMap<K, V> {
+impl<K: Ord, V> VecMap<K, V> {
     pub fn new() -> Self {
-        VecMap(Vec::new())
+        VecMap {
+            keys: Vec::new(),
+            values: Vec::new(),
+        }
     }
 
     pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
+        self.keys.is_empty()
     }
 
     pub fn clear(&mut self) {
-        self.0.clear();
-    }
-
-    fn find(&self, key: &K) -> Option<usize> {
-        for (i, (k, _)) in self.0.iter().enumerate() {
-            if k == key {
-                return Some(i);
-            }
-        }
-        None
+        self.keys.clear();
+        self.values.clear();
     }
 
     pub fn contains(&self, key: &K) -> bool {
-        self.find(key).is_some()
+        self.keys.binary_search(key).is_ok()
     }
 
     pub fn get(&self, key: &K) -> Option<&V> {
-        match self.find(key) {
-            Some(i) => Some(&self.0[i].1),
-            None => None,
+        match self.keys.binary_search(key) {
+            Ok(i) => Some(&self.values[i]),
+            Err(_) => None,
         }
     }
 
     pub fn get_mut(&mut self, key: &K) -> Option<&mut V> {
-        match self.find(key) {
-            Some(i) => Some(&mut self.0[i].1),
-            None => None,
+        match self.keys.binary_search(key) {
+            Ok(i) => Some(&mut self.values[i]),
+            Err(_) => None,
         }
     }
 
     pub fn insert(&mut self, key: K, value: V) -> Option<V> {
-        if let Some(old) = self.get_mut(&key) {
-            return Some(mem::replace(old, value));
+        match self.keys.binary_search(&key) {
+            Ok(i) => {
+                let old = mem::replace(&mut self.values[i], value);
+                Some(old)
+            }
+            Err(i) => {
+                self.keys.insert(i, key);
+                self.values.insert(i, value);
+                None
+            }
         }
-        self.0.push((key, value));
-        None
     }
 
     pub fn remove(&mut self, key: &K) -> Option<V> {
-        match self.find(key) {
-            Some(i) => Some(self.0.remove(i).1),
-            None => None,
+        match self.keys.binary_search(key) {
+            Ok(i) => {
+                self.keys.remove(i);
+                Some(self.values.remove(i))
+            }
+            Err(_) => None,
         }
     }
 
     pub fn values(&self) -> impl Iterator<Item = &V> {
-        self.0.iter().map(|kv| &kv.1)
+        self.values.iter()
     }
 }
